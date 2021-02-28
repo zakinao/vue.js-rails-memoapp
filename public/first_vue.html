@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <title>Snippets App</title>
+  </head>
+  <body>
+    <div id="app">
+      <p>{{ message }}</p>
+      <p>{{ message2 }}</p>
+      <button @click="changeMsg">Change</button>
+      <ul>
+        <li v-for="data in list">{{ data.title }}</li>
+      </ul>
+      <button @click="listSnippet">listSnippet</button>
+      <div>
+        <input v-model="title" placeholder="title">
+        <input v-model="language" placeholder="language">
+        <input v-model="contents" placeholder="contents">
+      </div>
+      <button @click="postSnippet">postSnippet</button>
+    </div>
+
+    <script>
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            message: "Hello Vue!",
+            message2: 'Hoge',
+            list: [
+              { title: 'title1' },
+              { title: 'title2' }
+            ],
+            title: 'new title',
+            language: 'Ruby',
+            contents: 'contents'
+          };
+        },
+        mounted () {
+          this.setMsg();
+        },
+        methods: {
+          setMsg() {
+            this.message = 'Set Message';
+          },
+          changeMsg() {
+            this.message = 'Change Message'
+            axios.get('/snippets.json')
+              .then(response => (
+                this.message2 = this.list[0]['title']
+              ));
+          },
+          listSnippet() {
+            axios.get('/snippets.json')
+              .then(response => (
+                this.list = response.data
+              ));
+          },
+          postSnippet () {
+            axios.post('/snippets.json', {title: 'new title', language: 'Ruby', contents: 'contents'})
+              .then(response => (
+                this.listSnippet()
+              ))
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
